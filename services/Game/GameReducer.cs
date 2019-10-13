@@ -4,24 +4,18 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using services.player;
-using services.player.Events;
-using services.player.Game;
+using Services.Ship;
 
-namespace services
+namespace Services.Game
 {
-    public class GameReducers: INotificationHandler<IEvent<Game>>, 
+    public class GameReducers : INotificationHandler<IEvent<Game>>,
         IRequestHandler<GetGameState, Game>
     {
-        
-        private static IDictionary<Guid, List<IEvent<Game>>> Events { get; } = new Dictionary<Guid, List<IEvent<Game>>>();
+        private static IDictionary<Guid, List<IEvent<Game>>> Events { get; } =
+            new Dictionary<Guid, List<IEvent<Game>>>();
+
         private Game _game { get; set; }
-        private IMediator _mediator;
-        public GameReducers(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-        
+   
         public void Apply(GameCreated action)
         {
             _game = new Game()
@@ -32,6 +26,11 @@ namespace services
             };
         }
 
+        public void Apply(GameErrorsViewed action)
+        {
+            _game.Errors.Clear();
+        }
+
         public void Apply(GameJoined action)
         {
             _game.PlayerB = action.PlayerId;
@@ -39,7 +38,7 @@ namespace services
 
         public void Apply(GameEnded action)
         {
-            _game.Status = Game.GameEnded; 
+            _game.Status = Game.GameEnded;
         }
 
         public void Apply(GameStarted action)
@@ -47,8 +46,15 @@ namespace services
             _game.Status = Game.GameStarted;
         }
 
+        public void Apply(GameError action)
+        {
+            _game.Errors.AddRange(action.ErrorMessages);
+        }
+
         public void Apply(BattleshipPlaced battleship)
         {
+            battleship.Battleship.Hits = new List<Coordinate>();
+
             if (_game.PlayerA == battleship.PlayerId)
             {
                 _game.ShipsA.Add(battleship.Battleship);
@@ -64,62 +70,50 @@ namespace services
         {
             if (battleship.GetCoords().Exists(x => x.X == coordinate.X && x.Y == coordinate.Y))
             {
-                battleship.Hits.Add(coordinate);
-                return true;
+                if (battleship.Hits.Where(x => x.X == coordinate.X 
+                                               && x.Y == coordinate.Y).Count() == 0)
+                {
+                    battleship.Hits.Add(coordinate);
+                    return true;
+                }
+            
             }
-
             return false;
         }
-        
-        public void Apply(ShotFired shot)
+
+        public async Task Apply(ShotFired shot)
         {
+            if (_game.Status == Game.GameCreated)
+            {
+                _game.Status = Game.GameStarted;
+            }
+
+            List<Battleship> targets = null;
             if (_game.PlayerA == shot.PlayerId)
             {
-                foreach (var ship in _game.ShipsB)
+                targets = _game.ShipsB;
+            }
+            else
+            {
+                targets = _game.ShipsA;
+            }
+
+            int shipsSunk = 0;
+            foreach (var ship in targets)
+            { 
+                if (ProcessBattleship(shot.Coordinate, ship))
                 {
-                    if (ProcessBattleship(shot.Coordinate, ship))
+                    if (ship.Length == ship.Hits.Count())
                     {
-                        _mediator.Publish(new BattleshipHit()
-                        {
-                            Battleship = ship,
-                            Shot = shot.Coordinate,
-                            GameId = _game.Id,
-                            PlayerId = _game.PlayerA
-                        });
-                    } else {
-                        _mediator.Publish(new BattleshipMissed()
-                        {
-                            Shot = shot.Coordinate,
-                            GameId = _game.Id,
-                            PlayerId = _game.PlayerA
-                        });
-                    };
+                        shipsSunk++;
+                    }
                 }
             }
-            if (_game.PlayerB == shot.PlayerId)
+
+            if (shipsSunk == targets.Count())
             {
-                foreach (var ship in _game.ShipsA)
-                {
-                    if (ProcessBattleship(shot.Coordinate, ship))
-                    {
-                        _mediator.Publish(new BattleshipHit()
-                        {
-                            Battleship = ship,
-                            Shot = shot.Coordinate,
-                            GameId = _game.Id,
-                            PlayerId = _game.PlayerB
-                        });
-                    }
-                    else
-                    {
-                        _mediator.Publish(new BattleshipMissed()
-                        {
-                            Shot = shot.Coordinate,
-                            GameId = _game.Id,
-                            PlayerId = _game.PlayerB
-                        });
-                    };
-                }
+                _game.Status = Game.GameEnded;
+                _game.Winner = shot.PlayerId;
             }
         }
 
@@ -136,11 +130,22 @@ namespace services
             }
             
             // Validate event before adding
-            if (!@notification.IsValid(_game))
+            if (@notification is IValidate<Game>)
             {
-                return;
+                if (!((IValidate<Game>) @notification).Validate(_game))
+                {
+                    Events[@notification.Id].Add(new GameError()
+                    {
+                        Event = @notification,
+                        Id = @notification.Id,
+                        ErrorMessages = @notification.ErrorMessages
+                    });
+                    
+                    return;
+                }
             }
             
+
             // Note: DB Insert at this stage. Hydrate if needed.
             Events[@notification.Id].Add(@notification);
             Apply((dynamic)@notification);

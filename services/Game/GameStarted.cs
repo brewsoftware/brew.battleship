@@ -1,12 +1,7 @@
-using Redux;
-
-namespace services.player.Events
+namespace Services.Game
 {
-    public class GameStarted: IEvent<services.Game>
+    public class GameStarted: IEvent<Game>
     {
-        public override bool IsValid(services.Game state)
-        {
-            return true;
-        }
+    
     }
 }

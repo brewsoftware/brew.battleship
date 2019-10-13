@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Services.Ship;
 
-namespace services.player.Game
+namespace Services.Game
 {
-    public class BattleshipPlaced : IEvent<services.Game>
+    public class BattleshipPlaced : IEvent<Game>, IValidate<Game>
     {
         public Guid PlayerId { get; set; }
         public Battleship Battleship { get; set; }
@@ -35,12 +36,29 @@ namespace services.player.Game
             return true;
         }
 
-        public override bool IsValid(services.Game state)
+        public bool Validate(Game state)
         {
-            return IsWithinBoard(this.Battleship) 
-                   && IsSafeToPlaceOnBoard(this.Battleship,
-                       PlayerId == state.PlayerA ? state.ShipsA : state.ShipsB)
-                && state.Status == services.Game.GameCreated;
+            bool isValid = true;
+            if (!IsWithinBoard(this.Battleship))
+            {
+                ErrorMessages.Add("Battleship outside board");
+                isValid = false;
+            }
+
+            if (!IsSafeToPlaceOnBoard(this.Battleship,
+                PlayerId == state.PlayerA ? state.ShipsA : state.ShipsB))
+            {
+                ErrorMessages.Add("Battleship overlaps");
+                isValid = false;
+            }
+
+            if (state.Status != Game.GameCreated)
+            {
+                ErrorMessages.Add("Game is locked");
+                isValid = false;
+            }
+
+            return isValid;
         }
     }
 }

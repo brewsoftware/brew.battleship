@@ -19,20 +19,24 @@
           <e p="Game.cs" t="Include" />
           <e p="GameCreated.cs" t="Include" />
           <e p="GameEnded.cs" t="Include" />
+          <e p="GameError.cs" t="Include" />
+          <e p="GameErrorsViewed.cs" t="Include" />
           <e p="GameJoined.cs" t="Include" />
-          <e p="GameLost.cs" t="Include" />
           <e p="GameReducer.cs" t="Include" />
           <e p="GameStarted.cs" t="Include" />
-          <e p="GameWon.cs" t="Include" />
           <e p="GetGameState.cs" t="Include" />
           <e p="ShotFired.cs" t="Include" />
         </e>
         <e p="IEvent.cs" t="Include" />
+        <e p="IValidate.cs" t="Include" />
         <e p="Module.cs" t="Include" />
         <e p="Player" t="Include">
+          <e p="GameLost.cs" t="Include" />
+          <e p="GameWon.cs" t="Include" />
+          <e p="Player.cs" t="Include" />
           <e p="PlayerCreated.cs" t="Include" />
+          <e p="PlayerError.cs" t="Include" />
           <e p="PlayerReducer.cs" t="Include" />
-          <e p="Players.cs" t="Include" />
         </e>
         <e p="Ship" t="Include">
           <e p="Battleship.cs" t="Include" />
@@ -52,7 +56,7 @@
         <e p="services.csproj" t="IncludeRecursive" />
       </e>
       <e p="tests" t="IncludeRecursive">
-        <e p="EventStates" t="Include">
+        <e p="EventPackages" t="Include">
           <e p="GameStates.cs" t="Include" />
         </e>
         <e p="Extensions.cs" t="Include" />

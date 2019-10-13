@@ -1,15 +1,9 @@
 using System;
-using Redux;
 
-namespace services.player.Events
+namespace Services.Game
 {
-    public class GameJoined : IEvent<services.Game>
+    public class GameJoined : IEvent<Game>
     {
         public Guid PlayerId { get; set; }
-
-        public override bool IsValid(services.Game state)
-        {
-            return true;
-        }
     }
 }

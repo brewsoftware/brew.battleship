@@ -1,8 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using MediatR;
-using services.player.Events;
-using services.player.Game;
+using Services.Game;
+using Services.Player;
+using Services.Ship;
 
 namespace services.tests.EventStates
 {
@@ -58,7 +59,7 @@ namespace services.tests.EventStates
                     Length = 3,
                     X = 3,
                     Y = 3,
-                    IsVertical = false,
+                    IsVertical = true,
                     PlayerId = PlayerBGuid
                 }
             });

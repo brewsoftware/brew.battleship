@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>services.player</RootNamespace>
+    <RootNamespace>Services</RootNamespace>
+    <AssemblyName>Services</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +12,6 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0" />
-    <PackageReference Include="Redux.NET" Version="2.0.0" />
   </ItemGroup>
 
 </Project>

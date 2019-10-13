@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using services.player;
-using services.player.Game;
+using Services.Game;
 
-namespace services
+namespace Services.Ship
 {
     public class Battleship : IAggregate
     {
@@ -14,7 +13,7 @@ namespace services
         public int Y { get; set; }
         
         public bool IsVertical { get; set; }
-        public List<Coordinate> Hits { get; } = new List<Coordinate>();
+        public List<Coordinate> Hits { get; set; } = new List<Coordinate>();
         
         public List<Coordinate> GetCoords(){
             var coords = new List<Coordinate>();

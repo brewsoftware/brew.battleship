@@ -1,12 +1,14 @@
 using System;
+using System.Collections.Generic;
 using MediatR;
 
-namespace services.player
+namespace Services
 {
     public abstract class IEvent<T> : INotification where T : IAggregate
     {
         public Guid Id { get; set; }
-        public abstract  bool IsValid(T state);
+        
+        public List<String> ErrorMessages { get; } = new List<string>();
     }
 
     public interface IAggregate

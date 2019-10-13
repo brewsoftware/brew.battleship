@@ -1,9 +1,9 @@
 using System;
 using MediatR;
 
-namespace Services.Game
+namespace Services.Player
 {
-    public class GetGameState : IRequest<Game>
+    public class GameWon : IEvent<Player>
     {
         public Guid GameId { get; set; }
     }

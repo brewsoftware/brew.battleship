@@ -3,7 +3,9 @@ using System.Linq;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using services;
-using services.player.Game;
+using Services;
+using Services.Game;
+using Services.Player;
 
 namespace services.player
 {
@@ -16,7 +18,7 @@ namespace services.player
                 AppDomain.CurrentDomain.GetAssemblies()
                     .Where(x =>
                         (
-                            x.FullName.Contains("services")
+                            x.FullName.Contains("Services")
                         )
                     ).ToArray()
             );
@@ -30,7 +32,7 @@ namespace services.player
 
         public static IServiceCollection CanProcessGames(this IServiceCollection services)
         {
-            services.RegisterGenericHandlers(typeof(IEvent<services.Game>), typeof(GameReducers));
+            services.RegisterGenericHandlers(typeof(IEvent<Game>), typeof(GameReducers));
             //services.AddTransient<IRequestHandler<IRequest<GetGameState>>, GameReducers>();
             return services;
         }

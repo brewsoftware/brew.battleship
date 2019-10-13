@@ -1,9 +1,8 @@
 using System;
 using MediatR;
-using Redux;
-using services.player.Game;
+using Services.Game;
 
-namespace services.player.Events
+namespace Services.Ship
 {
     public class BattleshipHit : INotification
     {
